@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2023 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -335,13 +335,13 @@
  * Thermal Protection parameters for the bed are just as above for hotends.
  */
 #if ENABLED(THERMAL_PROTECTION_BED)
-  #define THERMAL_PROTECTION_BED_PERIOD        20 // (seconds)
+  #define THERMAL_PROTECTION_BED_PERIOD       180 // (seconds)
   #define THERMAL_PROTECTION_BED_HYSTERESIS     2 // (°C)
 
   /**
    * As described above, except for the bed (M140/M190/M303).
    */
-  #define WATCH_BED_TEMP_PERIOD                60 // (seconds)
+  #define WATCH_BED_TEMP_PERIOD               180 // (seconds)
   #define WATCH_BED_TEMP_INCREASE               2 // (°C)
 #endif
 
@@ -620,7 +620,7 @@
  *
  * Define one or both of these to override the default 0-255 range.
  */
-//#define FAN_MIN_PWM 50
+#define FAN_MIN_PWM 50
 //#define FAN_MAX_PWM 128
 
 /**
@@ -931,7 +931,7 @@
 //#define HOMING_BACKOFF_POST_MM { 2, 2, 2 }  // (linear=mm, rotational=°) Backoff from endstops after homing
 //#define XY_COUNTERPART_BACKOFF_MM 0         // (mm) Backoff X after homing Y, and vice-versa
 
-//#define QUICK_HOME                          // If G28 contains XY do a diagonal move first
+#define QUICK_HOME                            // If G28 contains XY do a diagonal move first
 //#define HOME_Y_BEFORE_X                     // If G28 contains XY home Y before X
 //#define HOME_Z_FIRST                        // Home Z first. Requires a real endstop (not a probe).
 //#define CODEPENDENT_XY_HOMING               // If X/Y can't home without homing Y/X first
@@ -956,7 +956,7 @@
 
   // Safety: The probe needs time to recognize the command.
   //         Minimum command delay (ms). Enable and increase if needed.
-  //#define BLTOUCH_DELAY 500
+  #define BLTOUCH_DELAY 300
 
   /**
    * Settings for BLTOUCH Classic 1.2, 1.3 or BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1, and most clones:
@@ -1003,7 +1003,7 @@
    *
    * Set the default state here, change with 'M401 S' or UI, use M500 to save, M502 to reset.
    */
-  //#define BLTOUCH_HS_MODE true
+  #define BLTOUCH_HS_MODE true
 
   #ifdef BLTOUCH_HS_MODE
     // The probe Z offset (M851 Z) is the height at which the probe triggers.
@@ -1233,8 +1233,12 @@
 #define DISABLE_IDLE_E    // Shut down all idle extruders
 
 // Default Minimum Feedrates for printing and travel moves
-#define DEFAULT_MINIMUMFEEDRATE       0.0     // (mm/s. °/s for rotational-only moves) Minimum feedrate. Set with M205 S.
-#define DEFAULT_MINTRAVELFEEDRATE     0.0     // (mm/s. °/s for rotational-only moves) Minimum travel feedrate. Set with M205 T.
+#define DEFAULT_MINIMUMFEEDRATE             0.0     // (mm/s) Minimum feedrate. Set with M205 S.
+#define DEFAULT_MINTRAVELFEEDRATE           0.0     // (mm/s) Minimum travel feedrate. Set with M205 T.
+#if HAS_ROTATIONAL_AXES
+  #define DEFAULT_ANGULAR_MINIMUMFEEDRATE   0.0     // (°/s) Minimum feedrate for rotational-only moves. Set with M205 P.
+  #define DEFAULT_ANGULAR_MINTRAVELFEEDRATE 0.0     // (°/s) Minimum travel feedrate for rotational-only moves. Set with M205 Q.
+#endif
 
 // Minimum time that a segment needs to take as the buffer gets emptied
 #define DEFAULT_MINSEGMENTTIME        20000   // (µs) Set with M205 B.
@@ -1374,7 +1378,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-//#define ADAPTIVE_STEP_SMOOTHING
+#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1460,8 +1464,9 @@
 // Change values more rapidly when the encoder is rotated faster
 #define ENCODER_RATE_MULTIPLIER
 #if ENABLED(ENCODER_RATE_MULTIPLIER)
-  #define ENCODER_10X_STEPS_PER_SEC   30  // (steps/s) Encoder rate for 10x speed
-  #define ENCODER_100X_STEPS_PER_SEC  80  // (steps/s) Encoder rate for 100x speed
+  #define ENCODER_5X_STEPS_PER_SEC    30  // (steps/s) Encoder rate for 10x speed
+  #define ENCODER_10X_STEPS_PER_SEC   80  // (steps/s) Encoder rate for 100x speed
+  #define ENCODER_100X_STEPS_PER_SEC 130  // (steps/s) Encoder rate for 100x speed
 #endif
 
 // Play a beep when the feedrate is changed from the Status Screen
@@ -1477,7 +1482,7 @@
 //#define LCD_BACKLIGHT_TIMEOUT_MINS 1  // (minutes) Timeout before turning off the backlight
 
 #if HAS_BED_PROBE && ANY(HAS_MARLINUI_MENU, HAS_TFT_LVGL_UI)
-  //#define PROBE_OFFSET_WIZARD       // Add a Probe Z Offset calibration option to the LCD menu
+  #define PROBE_OFFSET_WIZARD         // Add a Probe Z Offset calibration option to the LCD menu
   #if ENABLED(PROBE_OFFSET_WIZARD)
     /**
      * Enable to init the Probe Z-Offset when starting the Wizard.
@@ -1513,7 +1518,7 @@
   #endif
 
   // Include a page of printer information in the LCD Main Menu
-  //#define LCD_INFO_MENU
+  #define LCD_INFO_MENU
   #if ENABLED(LCD_INFO_MENU)
     //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages
   #endif
@@ -1524,6 +1529,7 @@
    * Axis moves <= 1/2 the axis length and Extruder moves <= EXTRUDE_MAXLENGTH
    * will be shown in the move submenus.
    */
+
   #define MANUAL_MOVE_DISTANCE_MM                    10, 1.0, 0.1  // (mm)
   //#define MANUAL_MOVE_DISTANCE_MM         100, 50, 10, 1.0, 0.1  // (mm)
   //#define MANUAL_MOVE_DISTANCE_MM    500, 100, 50, 10, 1.0, 0.1  // (mm)
@@ -1568,12 +1574,12 @@
       //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~3260 (or ~940) bytes of flash.
     #endif
     #if ANY(HAS_MARLINUI_U8GLIB, TOUCH_UI_FTDI_EVE)
-      //#define SHOW_CUSTOM_BOOTSCREEN    // Show the bitmap in Marlin/_Bootscreen.h on startup.
+      #define SHOW_CUSTOM_BOOTSCREEN      // Show the bitmap in Marlin/_Bootscreen.h on startup.
     #endif
   #endif
 
   #if HAS_MARLINUI_U8GLIB
-    //#define CUSTOM_STATUS_SCREEN_IMAGE  // Show the bitmap in Marlin/_Statusscreen.h on the status screen.
+    #define CUSTOM_STATUS_SCREEN_IMAGE    // Show the bitmap in Marlin/_Statusscreen.h on the status screen.
   #endif
 
   //#define SOUND_MENU_ITEM   // Add a mute option to the LCD menu
@@ -1726,7 +1732,7 @@
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
    */
-  //#define POWER_LOSS_RECOVERY
+  #define POWER_LOSS_RECOVERY
   #if ENABLED(POWER_LOSS_RECOVERY)
     #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
     //#define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
@@ -1772,7 +1778,7 @@
    *  - SDSORT_CACHE_NAMES will retain the sorted file listing in RAM. (Expensive!)
    *  - SDSORT_DYNAMIC_RAM only uses RAM when the SD menu is visible. (Use with caution!)
    */
-  //#define SDCARD_SORT_ALPHA
+  #define SDCARD_SORT_ALPHA
 
   // SD Card Sorting options
   #if ENABLED(SDCARD_SORT_ALPHA)
@@ -1780,10 +1786,10 @@
     #define SDSORT_LIMIT       40     // Maximum number of sorted items (10-256). Costs 27 bytes each.
     #define SDSORT_FOLDERS     -1     // -1=above  0=none  1=below
     #define SDSORT_GCODE       false  // Enable G-code M34 to set sorting behaviors: M34 S<-1|0|1> F<-1|0|1>
-    #define SDSORT_USES_RAM    false  // Pre-allocate a static array for faster pre-sorting.
+    #define SDSORT_USES_RAM    true   // Pre-allocate a static array for faster pre-sorting.
     #define SDSORT_USES_STACK  false  // Prefer the stack for pre-sorting to give back some SRAM. (Negated by next 2 options.)
-    #define SDSORT_CACHE_NAMES false  // Keep sorted items in RAM longer for speedy performance. Most expensive option.
-    #define SDSORT_DYNAMIC_RAM false  // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use!
+    #define SDSORT_CACHE_NAMES true   // Keep sorted items in RAM longer for speedy performance. Most expensive option.
+    #define SDSORT_DYNAMIC_RAM true   // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use!
     #define SDSORT_CACHE_VFATS 2      // Maximum number of 13-byte VFAT entries to use for sorting.
                                       // Note: Only affects SCROLL_LONG_FILENAMES with SDSORT_CACHE_NAMES but not SDSORT_DYNAMIC_RAM.
   #endif
@@ -1796,7 +1802,7 @@
   //#define LONG_FILENAME_WRITE_SUPPORT   // Create / delete files with long filenames via M28, M30, and Binary Transfer Protocol
   //#define M20_TIMESTAMP_SUPPORT         // Include timestamps by adding the 'T' flag to M20 commands
 
-  //#define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu
+  #define SCROLL_LONG_FILENAMES           // Scroll long filenames in the SD card menu
 
   //#define SD_ABORT_NO_COOLDOWN          // Leave the heaters on after Stop Print (not recommended!)
 
@@ -1881,11 +1887,11 @@
   //#define CONFIGURATION_EMBEDDING
 
   // Add an optimized binary file transfer mode, initiated with 'M28 B1'
-  //#define BINARY_FILE_TRANSFER
+  #define BINARY_FILE_TRANSFER
 
   #if ENABLED(BINARY_FILE_TRANSFER)
     // Include extra facilities (e.g., 'M20 F') supporting firmware upload via BINARY_FILE_TRANSFER
-    //#define CUSTOM_FIRMWARE_UPLOAD
+    #define CUSTOM_FIRMWARE_UPLOAD
   #endif
 
   /**
@@ -1920,7 +1926,16 @@
  * By default an onboard SD card reader may be shared as a USB mass-
  * storage device. This option hides the SD card from the host PC.
  */
-//#define NO_SD_HOST_DRIVE   // Disable SD Card access over USB (for security).
+#define NO_SD_HOST_DRIVE     // Disable SD Card access over USB (for security).
+
+/**
+ * By default the framework is responsible for the shared media I/O.
+ * Enable this if you need Marlin to take care of the shared media I/O.
+ * Useful if shared media isn't working properly on some boards.
+ */
+#if HAS_MEDIA && DISABLED(NO_SD_HOST_DRIVE)
+  //#define DISKIO_HOST_DRIVE
+#endif
 
 /**
  * Additional options for Graphical Displays
@@ -2238,11 +2253,11 @@
  *
  * Warning: Does not respect endstops!
  */
-//#define BABYSTEPPING
+#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
   //#define EP_BABYSTEPPING                 // M293/M294 babystepping with EMERGENCY_PARSER support
-  //#define BABYSTEP_WITHOUT_HOMING
-  //#define BABYSTEP_ALWAYS_AVAILABLE       // Allow babystepping at all times (not just during movement)
+  #define BABYSTEP_WITHOUT_HOMING
+  #define BABYSTEP_ALWAYS_AVAILABLE         // Allow babystepping at all times (not just during movement)
   //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
   //#define BABYSTEP_INVERT_Z               // Enable if Z babysteps should go the other way
   //#define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps
@@ -2261,9 +2276,13 @@
 
   //#define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
 
-  //#define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
-  #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
-    //#define BABYSTEP_HOTEND_Z_OFFSET      // For multiple hotends, babystep relative Z offsets
+  #define BABYSTEP_ZPROBE_OFFSET            // Combine M851 Z and Babystepping
+  //#define BABYSTEP_GLOBAL_Z               // Combine M424 Z and Babystepping
+
+  #if ANY(BABYSTEP_ZPROBE_OFFSET, BABYSTEP_GLOBAL_Z)
+    #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
+      //#define BABYSTEP_HOTEND_Z_OFFSET    // For multiple hotends, babystep relative Z offsets
+    #endif
     //#define BABYSTEP_GFX_OVERLAY          // Enable graphical overlay on Z-offset editor
   #endif
 #endif
@@ -2353,10 +2372,10 @@
  * the probe to be unable to reach any points.
  */
 #if PROBE_SELECTED && !IS_KINEMATIC
-  //#define PROBING_MARGIN_LEFT PROBING_MARGIN
-  //#define PROBING_MARGIN_RIGHT PROBING_MARGIN
-  //#define PROBING_MARGIN_FRONT PROBING_MARGIN
-  //#define PROBING_MARGIN_BACK PROBING_MARGIN
+  #define PROBING_MARGIN_LEFT PROBING_MARGIN
+  #define PROBING_MARGIN_RIGHT PROBING_MARGIN
+  #define PROBING_MARGIN_FRONT PROBING_MARGIN
+  #define PROBING_MARGIN_BACK PROBING_MARGIN
 #endif
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
@@ -2849,7 +2868,7 @@
  *
  * Enable PARK_HEAD_ON_PAUSE to add the G-code M125 Pause and Park.
  */
-//#define ADVANCED_PAUSE_FEATURE
+#define ADVANCED_PAUSE_FEATURE
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #define PAUSE_PARK_RETRACT_FEEDRATE         60  // (mm/s) Initial retract feedrate.
   #define PAUSE_PARK_RETRACT_LENGTH            2  // (mm) Initial retract.
@@ -3408,7 +3427,7 @@
   /**
    * Step on both rising and falling edge signals (as with a square wave).
    */
-  //#define EDGE_STEPPING
+  #define EDGE_STEPPING
 
   /**
    * Enable M122 debugging command for TMC stepper drivers.
@@ -3801,6 +3820,14 @@
  */
 //#define CNC_COORDINATE_SYSTEMS
 
+/**
+ * CNC Drilling Cycle - UNDER DEVELOPMENT
+ *
+ * Enables G81 to perform a drilling cycle.
+ * Currently only supports a single cycle, no G-code chaining.
+ */
+//#define CNC_DRILLING_CYCLE
+
 // @section reporting
 
 /**
@@ -3927,6 +3954,7 @@
 #ifdef G0_FEEDRATE
   //#define VARIABLE_G0_FEEDRATE // The G0 feedrate is set by F in G0 motion mode
 #endif
+//#define G0_ANGULAR_FEEDRATE 2700 // (°/min)
 
 // @section gcode
 
@@ -4067,12 +4095,12 @@
  * Host Prompt Support enables Marlin to use the host for user prompts so
  * filament runout and other processes can be managed from the host side.
  */
-//#define HOST_ACTION_COMMANDS
+#define HOST_ACTION_COMMANDS
 #if ENABLED(HOST_ACTION_COMMANDS)
-  //#define HOST_PAUSE_M76                // Tell the host to pause in response to M76
-  //#define HOST_PROMPT_SUPPORT           // Initiate host prompts to get user feedback
+  #define HOST_PAUSE_M76                  // Tell the host to pause in response to M76
+  #define HOST_PROMPT_SUPPORT             // Initiate host prompts to get user feedback
   #if ENABLED(HOST_PROMPT_SUPPORT)
-    //#define HOST_STATUS_NOTIFICATIONS   // Send some status messages to the host as notifications
+    #define HOST_STATUS_NOTIFICATIONS     // Send some status messages to the host as notifications
   #endif
   //#define HOST_START_MENU_ITEM          // Add a menu item that tells the host to start
   //#define HOST_SHUTDOWN_MENU_ITEM       // Add a menu item that tells the host to shut down
